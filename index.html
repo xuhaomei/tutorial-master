@@ -1,0 +1,113 @@
+<!doctype html>         <!--没有具体作用，但必须要加，历史沿革问题-->
+<html lang="en">        <!--全局属性-语言设置-->
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">        <!--元数据-字符集设置-->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">      <!--自适应宽度-->
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+
+  <title>Hello, world!</title>       <!--网页标题-->
+  <script src="js/fetchapi.js"></script>     <!--引入js文件-->
+</head>
+
+<body onload="getStudents()">         <!--页面加载后立即执行getStudents()函数-->
+  <div class="container">             <!--.container 类用于固定宽度并支持响应式布局的容器。 .container-fluid 类用于 100% 宽度，占据全部视口（viewport）的容器。-->
+    <div class="jumbotron text-center mt-5">      <!--jumbotron-该组件可以增加标题的大小，并为登陆页面内容添加更多的外边距（margin）。在.container class内使用会获得带圆角的屏幕，在所有的 .container class 外使用 .jumbotron class，可以获得占用全部宽度且不带圆角的超大屏幕-->
+                                                  <!--text-center设定文本居中。-->
+                                                  <!--margin影响的是本元素与相邻外界元素之间的距离，这里简称外边距；padding影响的元素本身与其内部子元素之间的距离，简称为内填充。bootstrap4提供了简写的class名，名称分别以m-开头和p-开头的类。影响距离大小的值有0,1,2,3,4,5,auto,调整某一侧的边距有几个缩写,t,b,l,r,x,y含义分别是top,bottom,left,right,left和right,top和bottom-->
+      <h2>STUDENT CRUD APP</h2>
+    </div>
+
+    <form onsubmit="addStudent(event)">        <!--提交表单时触发-->
+      <div class="form-group">                 <!--bootstrap提供了：垂直表单（默认），内联表单，水平表单三种表单布局。
+                                                创建基本表单的步骤：
+                                                向父 <form> 元素添加 role="form"。（不加默认为form）
+                                                把标签和控件放在一个带有 class .form-group 的 <div> 中。这是获取最佳间距所必需的。
+                                                向所有的文本元素 <input>、<textarea> 和 <select> 添加 class ="form-control" 。
+                                                内联表单：向 <form> 标签添加 class .form-inline。
+                                                水平表单：
+                                                向父 <form> 元素添加 class .form-horizontal。
+                                                把标签和控件放在一个带有 class .form-group 的 <div> 中。
+                                                向标签添加 class .control-label。-->
+        <label for="name">Name</label>         <!--<label> 标签为 input 元素定义标注（标记）。label 元素不会向用户呈现任何特殊效果。不过，它为鼠标用户改进了可用性。如果您在 label 元素内点击文本，就会触发此控件。就是说，当用户选择该标签时，浏览器就会自动将焦点转到和标签相关的表单控件上。<label> 标签的 for 属性应当与相关元素的 id 属性相同。-->
+        <input type="text" class="form-control" id="name" placeholder="Name">         <!--placeholder规定帮助用户填写输入字段的提示。-->
+      </div>
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email">
+      </div>
+      <div class="form-group">
+        <label for="contactno">Contact No</label>
+        <input type="number" class="form-control" id="contactno" placeholder="Enter Contact No">
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>    <!--任何带有 class .btn 的元素都会继承圆角灰色按钮的默认外观。.but-primary原始按钮样式（未被操作）。-->
+    </form>
+    <small style="color:green" id="status"></small>                  <!--在元素两旁添加 <small>，或者添加 .small class，这样 能得到一个字号更小的颜色更浅的文本.-->
+
+    <small style="color:red" id="errMessage"></small>
+    <table class="table table-dark mt-5">                              <!--	.table为任意 <table> 添加基本样式 (只有横向分隔线),.table-dark黑色表格-->
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">E-mail</th>
+          <th scope="col">Contact No</th>
+          <th scope="col">Update</th>
+          <th scope="col">Delete</th>
+        </tr>
+      </thead>
+      <tbody id='table-body'>
+        <!-- This should fetch the students details form DB -->
+      </tbody>
+    </table>
+
+
+
+  </div>
+
+  <!-- 弹窗隐藏区域 -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <form>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">UPDATE</h4>
+                <button id="id1" style="display: none"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="name1">Name</label>
+                    <input type="text" class="form-control" id="name1" placeholder="Name">
+                </div>
+                <div class="form-group">
+                    <label for="email1">Email</label>
+                    <input type="email" class="form-control" id="email1" aria-describedby="emailHelp" placeholder="Enter Email">
+                </div>
+                <div class="form-group">
+                    <label for="contactno1">Contact No</label>
+                    <input type="number" class="form-control" id="contactno1" placeholder="Enter Contact No">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>close</button>
+                <button type="submit" class="btn btn-primary" data-dismiss="modal" onclick="updateStudent(event)"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>save</button>
+            </div>
+        </div>
+      </form>
+    </div>
+</div>
+
+  <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+
+</html>
