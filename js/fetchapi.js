@@ -36,6 +36,66 @@ function getStudents(){         //定义函数
 
 }
 
+function getStudentsByName(event){     
+    event.preventDefault();    
+    let name =  document.getElementById('name2').value;
+
+    //FetchAPI
+    //Fetch always return Promise with resolve
+    fetch('http://localhost:3000/contacts').then(response =>{   
+        if(response.ok){
+          // console.log(response.json());
+            return response.json();                 
+        }
+        else{
+            if(response.status == 404){
+                return Promise.reject(new Error('InValid URL..'))
+            }
+           else if(response.status == 500){
+                return Promise.reject(new Error('Some Internal Error Occured...'));
+            }
+           else if(response.status == 401){
+            return Promise.reject(new Error('UnAuthorized User..'));
+           }
+        }
+        
+    }).then(studentsListResponse =>{               
+        studentsList = studentsListResponse;
+       // console.log('studentsList', studentsList);
+        let tableEle = document.getElementsByTagName('table')[0];               
+        let tbodyEle = tableEle.getElementsByTagName('tbody')[0];            
+        
+        let tbodyEleInnerHTMLString = '';                                       
+
+        studentsListResponse.forEach(student =>{
+            if(student.name == name){
+                tbodyEleInnerHTMLString += `
+                    <tr>
+                        <td>${student.name}</td>
+                        <td>${student.email}</td>
+                        <td>${student.contactno}</td>
+                        <td><button class='btn btn-primary' type='button' onclick='displayModal(${student.id})'>Update</button></td>
+                        <td ><i class='fa fa-trash' style='color:red;font-size:1.2em;cursor:pointer' onclick='deleteStudent(${student.id})'></i></td>       
+                    </tr>
+                    `; 
+            } 
+            else if(student.name != name){
+                let alertEle = document.getElementById('alert');
+                alertEle.innerText = "未找到相关信息";
+            }                                                           
+        });
+
+        tbodyEle.innerHTML = tbodyEleInnerHTMLString;
+        
+        $('#table-body').html(tbodyEle.innerHTML);
+
+        }).catch(error =>{
+            let errorEle = document.getElementById('errMessage');
+            errorEle.innerText = error.message;         
+        })
+
+}
+
 
 function displayReposToHTML(studentsListResponse){
     //logic
@@ -114,7 +174,6 @@ function addStudent(event){
     let errorEle = document.getElementById('errMessage');
         errorEle.innerText = error.message;
   })
-  location.reload();
 }
 
 function deleteStudent(id){
